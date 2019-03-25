@@ -1,10 +1,10 @@
 
-# Task Manager
-Task Manager Application - Single Page application build using Angular 5 as UI and Spring boot MicroServices is back-end services
+# Project Manager
+Project Manager Application - Single Page application build using Angular 5 as UI and Spring boot MicroServices is back-end services
 
 ##Git Repository
 ```
-https://github.com/kvelmurugan83/taskmanager.git
+https://github.com/kvelmurugan83/projectManager.git
 ```
 
 ## Requirement
@@ -14,7 +14,7 @@ https://github.com/kvelmurugan83/taskmanager.git
 4. npm 5.5.1 
 
 ## Setting up the environment - Mysql 
-Go to Task manager API and run the below command to start the mysql server in docker
+Go to Project manager API and run the below command to start the mysql server in docker
 
 ```
 docker-compose up -d
@@ -22,24 +22,24 @@ docker-compose up -d
 
 ### Running Spring boot Micro service using Maven.
 ```
-mvnw package && java -jar target/taskManagerApp-0.0.1-SNAPSHOT.jar
+mvnw package && java -jar target/projectManagerApi-0.0.1-SNAPSHOT.jar
 ```
 
 ### Docker image for Task Manager API Micro service
-Go to Task manager API and run the below command to building image for TaskManager API
+Go to Project manager API and run the below command to building image for Project Manager API
 
 ```
 mvnw install dockerfile:build
 ```
 
-### Starting Task Manager API App
-After Building the docker image, To execute the below command to run the task manager API Application in docker 
+### Starting Project Manager API App
+After Building the docker image, To execute the below command to run the project manager API Application in docker 
 
 ```
-docker run -p 8080:8080 -t kvel/taskmanagerapi
+docker run -p 8080:8080 -t kvel/projectManagerApi
 ```
 
-### Starting Task Manager UI
+### Starting Project Manager UI
 
 Install node packages by executing the below command
 
