@@ -1,0 +1,172 @@
+<div class="row">
+  <div class="col-md-2">&nbsp;</div>
+  <div class="col-md-6">
+    <div class="container-fluid" style="padding-left:0px;">
+      <div class="alert alert-danger" role="alert" *ngIf="error">
+        {{errorMessage}}
+      </div>
+      <div class="alert alert-success" role="alert" *ngIf="success">
+        {{successMsg}}
+      </div>
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-2"><strong>Project : </strong></div>
+          <div class="col-md-8">
+            <input type="text" class="form-control underlined" name="project" id="project" [(ngModel)]="project.project"
+              required>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-4">
+            <input type="checkbox" name="dates" value="true" [(ngModel)]="enableDate"> Set Start and End Date
+          </div>
+          <div class="col-md-3">
+            <input type="text" class="form-control underlined" name="startDate" id="startDate" [(ngModel)]="project.startDate"
+              *ngIf="enableDate" placeholder="YYYY-MM-DD">
+          </div>
+          <div class="col-md-3">
+            <input type="text" class="form-control underlined" ngbDatepicker  name="endDate" id="endDate" [(ngModel)]="project.endDate"
+              *ngIf="enableDate" placeholder="YYYY-MM-DD">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-2"><strong>Priority : </strong></div>
+          <div class="col-md-8">
+            <div class="form-group">
+              <div class="slidecontainer">
+                <input type="range" min="0" max="30" name="priority" id="priority" [(ngModel)]="project.priority" style='width:100%'
+                  list="ticks" data-show-value="true">
+                <datalist id="ticks">
+                  <option value="0" label="0"></option>
+                  <option value="10" label=""></option>
+                  <option value="20" label=""></option>
+                  <option value="30" label="30"></option>
+                </datalist>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-2"><strong>Manager : </strong></div>
+            <div class="col-md-8">
+              <select [(ngModel)]="project.manager.id" class="form-control underlined" name="manager" id="managerId">
+                
+                <option *ngFor="let user of users" [ngValue]="user.id">{{user.firstName + ' ' + user.lastName}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+              <button mat-button class="btn btn-secondary float-right" (click)="add()" *ngIf="project.id == 0 ">Add</button>
+              <button mat-button class="btn btn-secondary float-right" (click)="update()" *ngIf="project.id != 0 ">Update</button>
+            </div>
+            <div class="col-md-2">
+              <button mat-button class="btn btn-secondary float-right" (click)="reset()">Reset</button>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-10">
+            <hr />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-10">
+            <input type="text" class="form-control underlined" placeholder="search..." name="search" id="search"
+              [(ngModel)]="search">
+          </div>
+        </div>
+
+        <div class="row" style="padding-top:10px;">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-2">
+                Sort By:
+              </div>
+              <div class="col-md-9">
+                <button mat-button class="btn btn-secondary" (click)="sort('startDate')">Start Date</button>
+              &nbsp;&nbsp;
+                <button mat-button class="btn btn-secondary  " (click)="sort('endDate')">End Date</button>
+                &nbsp;&nbsp;
+                <button mat-button class="btn btn-secondary  " (click)="sort('priority')">Priority</button>
+                &nbsp;&nbsp;
+                  <button mat-button class="btn btn-secondary" (click)="sort('suspend')">Completed</button>
+                </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-10">
+            <hr style="border-top: dotted 3px;" />
+          </div>
+        </div>
+
+        <div class="container-fluid" *ngFor="let p of projects | filter:search" style="padding:0px;">
+          <div class="row mt-3" style="padding:0px;">
+            <div class="col-md-7" style='background-color: #fafafa;'>
+              <div class="row mt-3" style="padding-bottom:15px;padding-top:0px">
+                <div class="col-md-12">
+                  project: {{p.project}}
+                </div>
+              </div>
+              <div class="row mt-3" style="padding:0px;">
+                <div class="col-md-6">
+                  No Of Task:  {{p.noOfTasks}}
+                </div>
+
+                <div class="col-md-6">
+                  Completed: {{p.suspend}}
+                </div>
+              </div>
+              <div class="row mt-3" style="padding:0px;">
+                <div class="col-md-6">
+                  Start Date: {{p.startDate}}
+                </div>
+
+                <div class="col-md-6">
+                  End Date: {{p.endDate}}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="row mt-3" style="padding:0px;">
+                <div class="col-md-12">
+                  Priority
+                </div>
+              </div>
+              <div class="row mt-3" style="padding-top:20px;">
+                <div class="col-md-12">
+                  {{p.priority}}
+                </div>
+              </div>
+
+            </div>
+            <div class="col-md-1">
+              <div class="row mt-3">
+                <div class="col-md-12">
+                  <button mat-button class="btn btn-secondary   float-right"   (click)="edit(p)" >Update</button>
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-md-12">
+                  <button mat-button class="btn btn-secondary   float-right" (click)="suspend(p)">Suspend</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>

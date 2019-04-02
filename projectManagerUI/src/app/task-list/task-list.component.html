@@ -1,0 +1,78 @@
+<div class="row">
+  <div class="col-md-2">&nbsp;</div>
+  <div class="col-md-10">
+    <div class="container-fluid" style="padding-left:0px;">
+      <div class="alert alert-danger" role="alert" *ngIf="error">
+        {{errorMessage}}
+      </div>
+      <div class="alert alert-success" role="alert" *ngIf="success">
+        {{successMsg}}
+      </div>
+
+      <div class="row">
+        <div class="col-md-1">
+          <strong>Project: </strong>
+        </div>
+        <div class="col-md-3">
+
+          <input type="text" class="form-control underlined" placeholder="search..." name="search" id="search"
+            [(ngModel)]="search" (ngModelChange)="filterContains(search)" >
+        </div>
+        <div class="col-md-6">
+          <strong>Sort:</strong>&nbsp;&nbsp;
+          <button mat-button class="btn btn-secondary" (click)="sort('startDate')">Start Date</button>
+          &nbsp;&nbsp;
+          <button mat-button class="btn btn-secondary" (click)="sort('endDate')">End Date</button>
+          &nbsp;&nbsp;
+          <button mat-button class="btn btn-secondary" (click)="sort('priority')">Priority</button>
+          &nbsp;&nbsp;
+          <button mat-button class="btn btn-secondary" (click)="sort('end')">Completed</button>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-10">
+          <hr style="border-top: dotted 3px;" />
+        </div>
+      </div>
+
+      <div class="container-fluid" *ngFor="let task of tasks">
+        <div class="row mt-3">
+          <div class="col-md-2"><strong>Task</strong></div>
+          <div class="col-md-2"><strong>Parent task</strong></div>
+          <div class="col-md-1" style="margin-top:0px;padding:0px"><strong>Priority</strong></div>
+          <div class="col-md-2"><strong>Start Date</strong></div>
+          <div class="col-md-2"><strong>End Date</strong></div>
+          <div class="col-md-2"><strong></strong></div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-2 text-center">
+            <div style="background: #EEE;">
+              <span style="line-height: 70px; vertical-align: middle;">
+                {{task.taskName}}
+              </span>
+            </div>
+          </div>
+          <div class="col-md-2 text-center">
+            <div style="background: #EEE;">
+              <span style="line-height: 70px; vertical-align: middle;">
+                {{task.parentTask?.taskName}}&nbsp;
+              </span>
+            </div>
+          </div>
+          <div class="col-md-1" style="margin-top:0px;padding:0px"><strong>{{task.priority}}</strong></div>
+          <div class="col-md-2"><strong><strong>{{task.startDate}}</strong></strong></div>
+          <div class="col-md-2"><strong><strong>{{task.endDate}}</strong></strong></div>
+          <div class="col-md-2">
+            <button mat-button class="btn btn-primary" (click)="editTask(task)" [disabled]="task.end">Edit</button>&nbsp;&nbsp;
+            <button mat-button class="btn btn-primary" [disabled]="task.end" (click)="endTask(task)">End</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-10">
+            <hr style="border-top: dotted 3px;" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

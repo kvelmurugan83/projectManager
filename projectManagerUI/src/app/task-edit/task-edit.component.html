@@ -1,0 +1,131 @@
+<div class="row">
+  <div class="col-md-2">&nbsp;</div>
+  <div class="col-md-6">
+
+    <div class="card">
+      <div class="alert alert-danger" role="alert" *ngIf="error">
+        {{errorMessage}}
+      </div>
+      <div class="alert alert-success" role="alert" *ngIf="success">
+        {{successMsg}}
+      </div>
+
+      <div class="card-body" style="padding: 0px">
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-2">
+              <label for="taskName">Project :</label>
+            </div>
+            <div class="col-sm-7">
+              <select [(ngModel)]="task.project.id" class="form-control underlined" name="project" id="project">
+                <option *ngFor="let c of projects" [ngValue]="c.id">{{c.project}}</option>
+              </select>
+
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-2">
+              <label for="taskName">Task Name :</label>
+            </div>
+            <div class="col-sm-7">
+              <input type="text" class="form-control underlined" name="taskName" id="taskName" [(ngModel)]="task.taskName">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-2">
+
+            </div>
+            <div class="col-sm-7">
+              <input type="checkbox" name="dates" value="true" [(ngModel)]="task.isParentTask"> Parent Task
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-2">
+              <label for="priority">Priority :</label>
+            </div>
+            <div class="col-sm-7">
+              <div class="slidecontainer">
+                <input type="range" min="0" max="30" name="priority" id="priority" [(ngModel)]="task.priority" style='width:100%'
+                  list="ticks" data-show-value="true">
+                <datalist id="ticks">
+                  <option value="0" label="0"></option>
+                  <option value="10" label=""></option>
+                  <option value="20" label=""></option>
+                  <option value="30" label="30"></option>
+                </datalist>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-2">
+              <label for="parantTask">Parent Task :</label>
+            </div>
+            <div class="col-sm-7">
+              <select [(ngModel)]="task.parentTask.id" class="form-control underlined" name="parantTask" id="parantTask">
+                <option *ngFor="let c of parentTasks" [ngValue]="c.id">{{c.taskName}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-2">
+              <label for="startDate">Start Date : </label>
+            </div>
+            <div class="col-sm-8">
+              <div class="row">
+                <div class="col-sm-4">
+                  <input type="text" class="form-control underlined" name="startDate" id="startDate" placeholder="YYYY-MM-DD"
+                    [(ngModel)]="task.startDate">
+                </div>
+                <div class="col-sm-3">
+                  <label for="startDate">End Date : </label>
+                </div>
+                <div class="col-sm-4">
+                  <input type="text" class="form-control underlined" name="startDate" id="startDate" placeholder="YYYY-MM-DD"
+                    [(ngModel)]="task.endDate">
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-2">
+              <label for="taskName">User : </label>
+            </div>
+            <div class="col-sm-7">
+              <select [(ngModel)]="task.user.id" class="form-control underlined" name="user" id="user">
+                <option *ngFor="let c of users" [ngValue]="c.id">{{c.firstName + ' ' + c.lastName}}</option>
+              </select>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-3">
+              <button class="btn btn-primary float-right" (click)="addTask()" *ngIf="action =='Add Task'">Add Task</button>
+              <button class="btn btn-primary float-right" (click)="updateTask()" *ngIf="action !='Add Task'">Update</button>
+            </div>
+            <div class="col-sm-2">
+              <button (click)="resetData()" class="btn btn-primary float-right" *ngIf="action =='Add Task'">Reset</button>
+              <button (click)="cancelEdit()" class="btn btn-primary float-right" *ngIf="action !='Add Task'">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
