@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
@@ -13,49 +14,53 @@ import javax.persistence.EntityNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.cts.fse.projectmanager.bean.TaskBean;
 import com.cts.fse.projectmanager.entity.Task;
 import com.cts.fse.projectmanager.repository.TaskRepository;
+import com.cts.fse.projectmanager.transformer.TaskTransformer;
 
 public class TaskServiceTest {
 
 	TaskRepository repository = mock(TaskRepository.class);
 	TaskService service;
+	private UserService userService = mock(UserService.class);
+	private ProjectService projectService = mock(ProjectService.class);
 
 	@Before
 	public void setup() {
-		service = new TaskService(repository);
+		service = new TaskService(repository, userService, projectService);
 	}
 
 	@Test
 	public void testRetrieveAll() {
-		Task expected = Task.builder().build();
+		Task expected = Task.builder().taskName("Name").build();
 		when(repository.findAll()).thenReturn(Collections.singletonList(expected));
-		Iterable<Task> actual = service.findAll();
+		List<TaskBean> actual = service.findAll();
 		verify(repository).findAll();
 		actual.forEach(t -> {
-			assertEquals(t, expected);
+			assertEquals(t.getTaskName(), "Name");
 		});
 	}
 
 	@Test
 	public void testAdd() {
-		Task expected = Task.builder().build();
-		when(repository.save(expected)).thenReturn(expected);
+		TaskBean expected = TaskBean.builder().build();
+		when(repository.save(TaskTransformer.toEntity(expected))).thenReturn(TaskTransformer.toEntity(expected));
 
-		Task actual = service.add(expected);
+		TaskBean actual = service.add(expected);
 
-		verify(repository).save(expected);
+		verify(repository).save(TaskTransformer.toEntity(expected));
 		assertEquals(actual, expected);
 	}
 
 	@Test
 	public void testUpdate() {
-		Task expected = Task.builder().build();
-		when(repository.save(expected)).thenReturn(expected);
+		TaskBean expected = TaskBean.builder().build();
+		when(repository.save(TaskTransformer.toEntity(expected))).thenReturn(TaskTransformer.toEntity(expected));
 
-		Task actual = service.update(expected);
+		TaskBean actual = service.update(expected);
 
-		verify(repository).save(expected);
+		verify(repository).save(TaskTransformer.toEntity(expected));
 		assertEquals(actual, expected);
 	}
 
@@ -94,7 +99,7 @@ public class TaskServiceTest {
 
 	@Test
 	public void testFindById() {
-		Optional<Task> expected = Optional.of(Task.builder().taskId(Long.valueOf(1000)).build());
+		Optional<Task> expected = Optional.of(Task.builder().id(Long.valueOf(1000)).build());
 		when(repository.findById(Long.valueOf(1000))).thenReturn(expected);
 
 		service.findById(Long.valueOf(1000));

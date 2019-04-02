@@ -1,5 +1,7 @@
 package com.cts.fse.projectmanager.controller;
 
+import java.util.List;
+
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.cts.fse.projectmanager.entity.Project;
+import com.cts.fse.projectmanager.bean.ProjectBean;
 import com.cts.fse.projectmanager.service.ProjectService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,28 +32,28 @@ public class ProjectController {
 	ProjectService service;
 
 	@GetMapping()
-	public Iterable<Project> retrieveAll() {
+	public List<ProjectBean> retrieveAll() {
 		log.info("retrieveAll");
 		return service.findAll();
 	}
 
 	@PostMapping()
-	public Project add(@RequestBody Project project) {
+	public ProjectBean add(@RequestBody ProjectBean project) {
 		log.info("Saving");
 		return service.add(project);
 	}
 
 	@PutMapping()
-	public Project update(@RequestBody Project project) {
+	public ProjectBean update(@RequestBody ProjectBean project) {
 		log.info("updating " + project);
 		return service.update(project);
 	}
 
 	@GetMapping("/{id}")
-	public Project retrieveById(@PathVariable Long id) {
+	public ProjectBean retrieveById(@PathVariable Long id) {
 		log.info("retrive By Id : " + id);
 		try {
-			Project project = service.findById(id);
+			ProjectBean project = service.findById(id);
 			return project;
 		} catch (EntityNotFoundException ex) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project Not Found", ex);

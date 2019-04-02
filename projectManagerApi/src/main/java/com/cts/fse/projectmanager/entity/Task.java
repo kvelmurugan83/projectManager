@@ -10,13 +10,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 @Data
@@ -24,8 +27,8 @@ import lombok.ToString;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@RequiredArgsConstructor
 @ToString
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Task implements Serializable {
 
 	private static final long serialVersionUID = 20190121;
@@ -33,16 +36,16 @@ public class Task implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "TASK_ID")
-	private Long taskId;
+	private Long id;
 	
-	@OneToOne(fetch = FetchType.LAZY, optional = true)
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "PROJECT_ID")
 	private Project project;
 	
 	@Column(name = "IS_PARENT")
 	private Boolean isParentTask;
 	
-	@OneToOne(fetch = FetchType.LAZY, optional = true)
+	@OneToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "PARENT_ID")
 	private Task parentTask;
 	
@@ -61,7 +64,10 @@ public class Task implements Serializable {
 	@Column(name = "STATUS")
 	private String status;
 	
-	@OneToOne(fetch = FetchType.LAZY, optional = true)
+	@OneToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "USER_ID")
 	private User user;
+	
+	@Column(name = "END")
+	private boolean end;
 }

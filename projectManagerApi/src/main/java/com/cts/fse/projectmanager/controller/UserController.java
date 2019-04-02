@@ -1,5 +1,7 @@
 package com.cts.fse.projectmanager.controller;
 
+import java.util.List;
+
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.cts.fse.projectmanager.entity.User;
+import com.cts.fse.projectmanager.bean.UserBean;
 import com.cts.fse.projectmanager.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,34 +32,34 @@ public class UserController {
 	UserService service;
 
 	@GetMapping()
-	public Iterable<User> retrieveAll() {
+	public List<UserBean> retrieveAll() {
 		log.info("retrieveAll");
 		return service.findAll();
 	}
 
 	@GetMapping("/findByEmpId/{empId}")
-	public User findByEmpId(@PathVariable Long empId) {
+	public UserBean findByEmpId(@PathVariable Long empId) {
 		log.info("retrieveAll");
 		return service.findByEmpId(empId);
 	}
 
 	@PostMapping()
-	public User add(@RequestBody User user) {
+	public UserBean add(@RequestBody UserBean user) {
 		log.info("Saving");
 		return service.add(user);
 	}
 
 	@PutMapping()
-	public User update(@RequestBody User user) {
+	public UserBean update(@RequestBody UserBean user) {
 		log.info("updating " + user);
 		return service.update(user);
 	}
 
 	@GetMapping("/{id}")
-	public User retrieveById(@PathVariable Long id) {
+	public UserBean retrieveById(@PathVariable Long id) {
 		log.info("retrive By Id : " + id);
 		try {
-			User user = service.findById(id);
+			UserBean user = service.findById(id);
 			return user;
 		} catch (EntityNotFoundException ex) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found", ex);

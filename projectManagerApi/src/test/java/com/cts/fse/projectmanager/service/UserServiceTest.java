@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
@@ -13,8 +14,10 @@ import javax.persistence.EntityNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.cts.fse.projectmanager.bean.UserBean;
 import com.cts.fse.projectmanager.entity.User;
 import com.cts.fse.projectmanager.repository.UserRepository;
+import com.cts.fse.projectmanager.transformer.UserTransformer;
 
 public class UserServiceTest {
 
@@ -28,34 +31,37 @@ public class UserServiceTest {
 
 	@Test
 	public void testRetrieveAllUser() {
-		User user = User.builder().build();
-		when(repository.findAll()).thenReturn(Collections.singletonList(user));
-		Iterable<User> actual = service.findAll();
+		UserBean user = UserBean.builder().build();
+		User u = UserTransformer.toEntity(user);
+		when(repository.findAll()).thenReturn(Collections.singletonList(u));
+		List<UserBean> actual = service.findAll();
 		verify(repository).findAll();
-		actual.forEach(u -> {
-			assertEquals(u, user);
+		actual.forEach(o -> {
+			assertEquals(o, user);
 		});
 	}
 
 	@Test
 	public void testAdd() {
-		User user = User.builder().build();
-		when(repository.save(user)).thenReturn(user);
+		UserBean user = UserBean.builder().build();
+		User u = UserTransformer.toEntity(user);
+		when(repository.save(u)).thenReturn(u);
 		
-		User actual = service.add(user);
+		UserBean actual = service.add(user);
 		
-		verify(repository).save(user);
+		verify(repository).save(u);
 		assertEquals(actual, user);
 	}
 	
 	@Test
 	public void testUpdate() {
-		User user = User.builder().build();
-		when(repository.save(user)).thenReturn(user);
+		UserBean user = UserBean.builder().build();
+		User u = UserTransformer.toEntity(user);
+		when(repository.save(u)).thenReturn(u);
 		
-		User actual = service.update(user);
+		UserBean actual = service.update(user);
 		
-		verify(repository).save(user);
+		verify(repository).save(u);
 		assertEquals(actual, user);
 	}
 	
@@ -79,7 +85,7 @@ public class UserServiceTest {
 	
 	@Test
 	public void testFindById() {
-		Optional<User> user = Optional.of(User.builder().userId(Long.valueOf(1000)).build());
+		Optional<User> user = Optional.of(User.builder().id(Long.valueOf(1000)).build());
 		when(repository.findById(Long.valueOf(1000))).thenReturn(user);
 		
 		service.findById(Long.valueOf(1000));
@@ -89,10 +95,11 @@ public class UserServiceTest {
 	
 	@Test
 	public void testFindByEmpId() {
-		User user = User.builder().userId(Long.valueOf(1000)).build();
-		when(repository.findByEmpId(Long.valueOf(1000))).thenReturn(Collections.singletonList(user));
+		UserBean user = UserBean.builder().id(Long.valueOf(1000)).build();
+		User u = UserTransformer.toEntity(user);
+		when(repository.findByEmpId(Long.valueOf(1000))).thenReturn(Collections.singletonList(u));
 		
-		User actual = service.findByEmpId(Long.valueOf(1000));
+		UserBean actual = service.findByEmpId(Long.valueOf(1000));
 		
 		verify(repository).findByEmpId(Long.valueOf(1000));
 		assertEquals(actual, user);

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
@@ -13,48 +14,53 @@ import javax.persistence.EntityNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.cts.fse.projectmanager.bean.ProjectBean;
 import com.cts.fse.projectmanager.entity.Project;
 import com.cts.fse.projectmanager.repository.ProjectRepository;
+import com.cts.fse.projectmanager.transformer.ProjectTransformer;
 
 public class ProjectServiceTest {
 	ProjectRepository repository = mock(ProjectRepository.class);
 	ProjectService service;
+	private UserService userService = mock(UserService.class);;
+
+	private TaskService taskService = mock(TaskService.class);;
 
 	@Before
 	public void setup() {
-		service = new ProjectService(repository);
+		service = new ProjectService(repository, userService, taskService);
 	}
 
 	@Test
 	public void testRetrieveAll() {
-		Project project = Project.builder().build();
-		when(repository.findAll()).thenReturn(Collections.singletonList(project));
-		Iterable<Project> actual = service.findAll();
+		ProjectBean project = ProjectBean.builder().project("Project").build();
+		when(repository.findAll()).thenReturn(Collections.singletonList(ProjectTransformer.toEntity(project)));
+		List<ProjectBean> actual = service.findAll();
 		verify(repository).findAll();
 		actual.forEach(p -> {
-			assertEquals(p, project);
+			assertEquals(p.getProject(), "Project");
 		});
 	}
 
 	@Test
 	public void testAdd() {
-		Project expected = Project.builder().build();
-		when(repository.save(expected)).thenReturn(expected);
+		ProjectBean expected = ProjectBean.builder().build();
+		when(repository.save(ProjectTransformer.toEntity(expected))).thenReturn(ProjectTransformer.toEntity(expected));
 
-		Project actual = service.add(expected);
+		ProjectBean actual = service.add(expected);
 
-		verify(repository).save(expected);
+		verify(repository).save(ProjectTransformer.toEntity(expected));
 		assertEquals(actual, expected);
 	}
 
 	@Test
 	public void testUpdate() {
-		Project expected = Project.builder().build();
-		when(repository.save(expected)).thenReturn(expected);
+		ProjectBean expected = ProjectBean.builder().build();
+		when(repository.save(ProjectTransformer.toEntity(expected))).thenReturn(ProjectTransformer.toEntity(expected));
+		
+		ProjectBean actual = service.update(expected);
 
-		Project actual = service.update(expected);
-
-		verify(repository).save(expected);
+		verify(repository).save(ProjectTransformer.toEntity(expected));
 		assertEquals(actual, expected);
 	}
 
@@ -77,7 +83,7 @@ public class ProjectServiceTest {
 
 	@Test
 	public void testFindById() {
-		Optional<Project> expected = Optional.of(Project.builder().projectId(Long.valueOf(1000)).build());
+		Optional<Project> expected = Optional.of(Project.builder().id(Long.valueOf(1000)).build());
 		when(repository.findById(Long.valueOf(1000))).thenReturn(expected);
 
 		service.findById(Long.valueOf(1000));
@@ -87,15 +93,15 @@ public class ProjectServiceTest {
 
 	@Test
 	public void testfindByProjectName() {
-		Project expected = Project.builder().build();
+		Project expected = Project.builder().project("T").build();
 		when(repository.findByProject("TEST")).thenReturn(Collections.singletonList(expected));
 
-		Project actual = service.findByProjectName("TEST");
+		ProjectBean actual = service.findByProjectName("TEST");
 
 		verify(repository).findByProject("TEST");
-		assertEquals(actual, actual);
+		assertEquals(actual.getProject(), "T");
 	}
-	
+
 	@Test(expected = EntityNotFoundException.class)
 	public void testDeleteFail() {
 		Long id = new Long(1);

@@ -1,9 +1,13 @@
 package com.cts.fse.projectmanager.repository;
 
-import org.springframework.data.repository.CrudRepository;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.cts.fse.projectmanager.entity.Task;
 
-public interface TaskRepository extends CrudRepository<Task, Long> {
+public interface TaskRepository extends JpaRepository<Task, Long> {
 
+	//@Query("SELECT u FROM Task u WHERE u.project.id = :projectId")
+	List<Task> findByProjectId(Long projectId);
 }

@@ -36,9 +36,9 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.cts.fse.projectmanager.entity.Project;
-import com.cts.fse.projectmanager.entity.Task;
-import com.cts.fse.projectmanager.entity.User;
+import com.cts.fse.projectmanager.bean.ProjectBean;
+import com.cts.fse.projectmanager.bean.TaskBean;
+import com.cts.fse.projectmanager.bean.UserBean;
 import com.cts.fse.projectmanager.service.ProjectService;
 import com.cts.fse.projectmanager.service.TaskService;
 import com.cts.fse.projectmanager.service.UserService;
@@ -82,34 +82,34 @@ public class ProjectManagerServiceTest {
 		this.taskService.deleteAll();
 		this.projectService.deleteAll();
 		this.userService.deleteAll();
-		User vel = this.userService
-				.add(User.builder().firstName("Velmurugan").lastName("Kandasamy").empId(new Long(10001)).build());
-		User kumar = this.userService
-				.add(User.builder().firstName("Kumar").lastName("Moorthy").empId(new Long(10002)).build());
-		User karthik = this.userService
-				.add(User.builder().firstName("Karthik").lastName("Kannan").empId(new Long(10003)).build());
-		User krishna = this.userService
-				.add(User.builder().firstName("Krishnaraj").lastName("Jeganathan").empId(new Long(10004)).build());
+		UserBean vel = this.userService
+				.add(UserBean.builder().firstName("Velmurugan").lastName("Kandasamy").empId(new Long(10001)).build());
+		UserBean kumar = this.userService
+				.add(UserBean.builder().firstName("Kumar").lastName("Moorthy").empId(new Long(10002)).build());
+		UserBean karthik = this.userService
+				.add(UserBean.builder().firstName("Karthik").lastName("Kannan").empId(new Long(10003)).build());
+		UserBean krishna = this.userService
+				.add(UserBean.builder().firstName("Krishnaraj").lastName("Jeganathan").empId(new Long(10004)).build());
 
-		Project dataManagement = this.projectService.add(Project.builder().project("Data management").manager(karthik)
+		ProjectBean dataManagement = this.projectService.add(ProjectBean.builder().project("Data management").manager(karthik)
 				.priority(15).startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(5)).build());
 
-		Project appManagement = this.projectService.add(Project.builder().project("Application management")
+		ProjectBean appManagement = this.projectService.add(ProjectBean.builder().project("Application management")
 				.manager(kumar).priority(15).startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(15)).build());
 
-		Task createData = this.taskService.add(Task.builder().project(dataManagement).isParentTask(true)
+		TaskBean createData = this.taskService.add(TaskBean.builder().project(dataManagement).isParentTask(true)
 				.taskName("Create Data").priority(10).status("NEW").startDate(LocalDate.now())
 				.endDate(LocalDate.now().plusDays(10)).user(krishna).build());
 
-		Task updateData = this.taskService.add(Task.builder().project(dataManagement).isParentTask(false)
+		this.taskService.add(TaskBean.builder().project(dataManagement).isParentTask(false)
 				.parentTask(createData).taskName("Create Data").priority(10).status("NEW").startDate(LocalDate.now())
 				.endDate(LocalDate.now().plusDays(10)).user(vel).build());
 
-		Task createApp = this.taskService.add(Task.builder().project(appManagement).isParentTask(true)
+		TaskBean createApp = this.taskService.add(TaskBean.builder().project(appManagement).isParentTask(true)
 				.taskName("Create App").priority(10).status("NEW").startDate(LocalDate.now())
 				.endDate(LocalDate.now().plusDays(10)).user(vel).build());
 
-		Task updateApp = this.taskService.add(Task.builder().project(appManagement).isParentTask(false)
+		this.taskService.add(TaskBean.builder().project(appManagement).isParentTask(false)
 				.parentTask(createApp).taskName("Update App").priority(10).status("NEW").startDate(LocalDate.now())
 				.endDate(LocalDate.now().plusDays(10)).user(krishna).build());
 	}
@@ -126,16 +126,16 @@ public class ProjectManagerServiceTest {
 
 		this.mockMvc
 				.perform(post("/projectmanager/api/user").contentType(contentType)
-						.content(json(User.builder().firstName("SivaKumar").lastName("Raju").empId(Long.valueOf(10005))
+						.content(json(UserBean.builder().firstName("SivaKumar").lastName("Raju").empId(Long.valueOf(10005))
 								.build())))
 				.andExpect(status().isOk()).andExpect(content().contentType(contentType))
 				.andExpect(jsonPath("$.firstName", is("SivaKumar"))).andExpect(jsonPath("$.lastName", is("Raju")))
 				.andExpect(jsonPath("$.empId", is(10005)));
-		User user = this.userService.findByEmpId(Long.valueOf(10005));
+		UserBean user = this.userService.findByEmpId(Long.valueOf(10005));
 
 		this.mockMvc
 				.perform(post("/projectmanager/api/project").contentType(contentType)
-						.content(json(Project.builder().project("User management").priority(15).manager(user)
+						.content(json(ProjectBean.builder().project("User management").priority(15).manager(user)
 								.startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(15)).build())))
 				.andExpect(status().isOk()).andExpect(content().contentType(contentType))
 				.andExpect(jsonPath("$.project", is("User management"))).andExpect(jsonPath("$.priority", is(15)))
@@ -143,11 +143,11 @@ public class ProjectManagerServiceTest {
 						jsonPath("$.startDate", is(DateTimeFormatter.ofPattern("YYYY-MM-dd").format(LocalDate.now()))))
 				.andExpect(jsonPath("$.endDate",
 						is(DateTimeFormatter.ofPattern("YYYY-MM-dd").format(LocalDate.now().plusDays(15)))));
-		Project project = this.projectService.findByProjectName("User management");
+		ProjectBean project = this.projectService.findByProjectName("User management");
 
 		this.mockMvc
 				.perform(post("/projectmanager/api/task").contentType(contentType)
-						.content(json(Task.builder().project(project).isParentTask(false).taskName("Create Data")
+						.content(json(TaskBean.builder().project(project).isParentTask(false).taskName("Create Data")
 								.priority(10).status("NEW").startDate(LocalDate.now())
 								.endDate(LocalDate.now().plusDays(10)).user(user).build())))
 				.andExpect(status().isOk()).andExpect(content().contentType(contentType))
@@ -162,7 +162,7 @@ public class ProjectManagerServiceTest {
 	@Test
 	public void testCreateUser() throws Exception {
 		String jsonUser = json(
-				User.builder().firstName("SivaKumar").lastName("Raju").empId(Long.valueOf(10005)).build());
+				UserBean.builder().firstName("SivaKumar").lastName("Raju").empId(Long.valueOf(10005)).build());
 		this.mockMvc.perform(post("/projectmanager/api/user").contentType(contentType).content(jsonUser))
 				.andExpect(status().isOk()).andExpect(content().contentType(contentType))
 				.andExpect(jsonPath("$.firstName", is("SivaKumar"))).andExpect(jsonPath("$.lastName", is("Raju")))
@@ -171,8 +171,8 @@ public class ProjectManagerServiceTest {
 
 	@Test
 	public void testUpdateUser() throws Exception {
-		User user = this.userService
-				.add(User.builder().firstName("Venkat").lastName("Ramamoorthy").empId(Long.valueOf(10006)).build());
+		UserBean user = this.userService
+				.add(UserBean.builder().firstName("Venkat").lastName("Ramamoorthy").empId(Long.valueOf(10006)).build());
 		user.setFirstName("Venkateswaran");
 		this.mockMvc.perform(put("/projectmanager/api/user").contentType(contentType).content(json(user)))
 				.andExpect(status().isOk()).andExpect(content().contentType(contentType))
@@ -182,19 +182,19 @@ public class ProjectManagerServiceTest {
 	
 	@Test
 	public void testDeleteUser() throws Exception {
-		User user = this.userService
-				.add(User.builder().firstName("Senthil").lastName("Senthil").empId(Long.valueOf(10008)).build());
+		UserBean user = this.userService
+				.add(UserBean.builder().firstName("Senthil").lastName("Senthil").empId(Long.valueOf(10008)).build());
 		
-		this.mockMvc.perform(delete("/projectmanager/api/user/" + user.getUserId()))
+		this.mockMvc.perform(delete("/projectmanager/api/user/" + user.getId()))
 				.andExpect(status().isOk());
 		
-		this.mockMvc.perform(get("/projectmanager/api/user/" + user.getUserId()))
+		this.mockMvc.perform(get("/projectmanager/api/user/" + user.getId()))
 		.andExpect(status().isNotFound());
 	}
 
 	@Test
 	public void testCreateProject() throws Exception {
-		String jsonProject = json(Project.builder().project("User management").priority(15).startDate(LocalDate.now())
+		String jsonProject = json(ProjectBean.builder().project("User management").priority(15).startDate(LocalDate.now())
 				.endDate(LocalDate.now().plusDays(15)).build());
 		this.mockMvc.perform(post("/projectmanager/api/project").contentType(contentType).content(jsonProject))
 				.andExpect(status().isOk()).andExpect(content().contentType(contentType))
@@ -207,7 +207,7 @@ public class ProjectManagerServiceTest {
 
 	@Test
 	public void testUpdateProject() throws Exception {
-		Project project = this.projectService.add(Project.builder().project("Infra Management").priority(15)
+		ProjectBean project = this.projectService.add(ProjectBean.builder().project("Infra Management").priority(15)
 				.startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(15)).build());
 		project.setProject("Infrastructure Management");
 		project.setPriority(30);
@@ -225,19 +225,19 @@ public class ProjectManagerServiceTest {
 	
 	@Test
 	public void testDeleteProject() throws Exception {
-		Project project = this.projectService.add(Project.builder().project("Network Management").priority(15)
+		ProjectBean project = this.projectService.add(ProjectBean.builder().project("Network Management").priority(15)
 				.startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(15)).build());
 		
-		this.mockMvc.perform(delete("/projectmanager/api/project/" + project.getProjectId()))
+		this.mockMvc.perform(delete("/projectmanager/api/project/" + project.getId()))
 				.andExpect(status().isOk());
 		
-		this.mockMvc.perform(get("/projectmanager/api/project/" + project.getProjectId()))
+		this.mockMvc.perform(get("/projectmanager/api/project/" + project.getId()))
 		.andExpect(status().isNotFound());
 	}
 
 	@Test
 	public void testCreateTask() throws Exception {
-		String jsonTask = json(Task.builder().isParentTask(false).taskName("Create Data").priority(10).status("NEW")
+		String jsonTask = json(TaskBean.builder().isParentTask(false).taskName("Create Data").priority(10).status("NEW")
 				.startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(10)).build());
 		this.mockMvc.perform(post("/projectmanager/api/task").contentType(contentType).content(jsonTask))
 				.andExpect(status().isOk()).andExpect(content().contentType(contentType))
@@ -251,7 +251,7 @@ public class ProjectManagerServiceTest {
 	
 	@Test
 	public void testUpdateTask() throws Exception {
-		Task task = this.taskService.add(Task.builder().isParentTask(false).taskName("Create Data").priority(10).status("NEW")
+		TaskBean task = this.taskService.add(TaskBean.builder().isParentTask(false).taskName("Create Data").priority(10).status("NEW")
 				.startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(10)).build());
 		task.setTaskName("Modify Data");
 		task.setStatus("Completed");
@@ -267,13 +267,13 @@ public class ProjectManagerServiceTest {
 	
 	@Test
 	public void testDeleteTask() throws Exception {
-		Task task = this.taskService.add(Task.builder().isParentTask(false).taskName("Create Data").priority(10).status("NEW")
+		TaskBean task = this.taskService.add(TaskBean.builder().isParentTask(false).taskName("Create Data").priority(10).status("NEW")
 				.startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(10)).build());
 		
-		this.mockMvc.perform(delete("/projectmanager/api/task/" + task.getTaskId()))
+		this.mockMvc.perform(delete("/projectmanager/api/task/" + task.getId()))
 				.andExpect(status().isOk());
 		
-		this.mockMvc.perform(get("/projectmanager/api/task/" + task.getTaskId()))
+		this.mockMvc.perform(get("/projectmanager/api/task/" + task.getId()))
 		.andExpect(status().isNotFound());
 	}
 

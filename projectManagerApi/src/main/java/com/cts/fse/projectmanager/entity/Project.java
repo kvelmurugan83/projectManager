@@ -11,43 +11,54 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 @Builder
-@Data	
+@Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@RequiredArgsConstructor
 @ToString
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Project implements Serializable {
 
 	private static final long serialVersionUID = 20190121;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "PROJECT_ID")
-	private Long projectId;
-	
+	private Long id;
+
 	@Column(name = "PROJECT")
 	private String project;
-	
-	@Column(name = "START_DATE")
+
+	@Column(name = "START_DATE", nullable = true)
 	private LocalDate startDate;
-	
-	@Column(name = "END_DATE")
+
+	@Column(name = "END_DATE", nullable = true)
 	private LocalDate endDate;
-	
+
 	@Column(name = "PRIORITY")
 	private Integer priority;
 	
-	@OneToOne(fetch = FetchType.LAZY, optional = true)
+	@Column(name = "SUSPEND", nullable = true)
+	private Boolean suspend;
+
+	@OneToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "MANAGER_ID")
 	private User manager;
+	
+	@Transient
+	private int noOfTasks;
 }

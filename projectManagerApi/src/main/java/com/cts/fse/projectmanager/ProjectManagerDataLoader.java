@@ -7,9 +7,9 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Service;
 
-import com.cts.fse.projectmanager.entity.Project;
-import com.cts.fse.projectmanager.entity.Task;
-import com.cts.fse.projectmanager.entity.User;
+import com.cts.fse.projectmanager.bean.ProjectBean;
+import com.cts.fse.projectmanager.bean.TaskBean;
+import com.cts.fse.projectmanager.bean.UserBean;
 import com.cts.fse.projectmanager.service.ProjectService;
 import com.cts.fse.projectmanager.service.TaskService;
 import com.cts.fse.projectmanager.service.UserService;
@@ -29,32 +29,32 @@ public class ProjectManagerDataLoader implements ApplicationRunner {
 		this.taskService.deleteAll();
 		this.projectService.deleteAll();
 		this.userService.deleteAll();
-		User vel = this.userService
-				.add(User.builder().firstName("Velmurugan").lastName("Kandasamy").empId(new Long(10001)).build());
-		User kumar = this.userService
-				.add(User.builder().firstName("Kumar").lastName("Moorthy").empId(new Long(10002)).build());
-		User karthik = this.userService
-				.add(User.builder().firstName("Karthik").lastName("Kannan").empId(new Long(10003)).build());
-		User krishna = this.userService
-				.add(User.builder().firstName("Krishnaraj").lastName("Jeganathan").empId(new Long(10004)).build());
+		UserBean vel = this.userService
+				.add(UserBean.builder().firstName("Velmurugan").lastName("Kandasamy").empId(new Long(10001)).build());
+		UserBean kumar = this.userService
+				.add(UserBean.builder().firstName("Kumar").lastName("Moorthy").empId(new Long(10002)).build());
+		UserBean karthik = this.userService
+				.add(UserBean.builder().firstName("Karthik").lastName("Kannan").empId(new Long(10003)).build());
+		UserBean krishna = this.userService
+				.add(UserBean.builder().firstName("Krishnaraj").lastName("Jeganathan").empId(new Long(10004)).build());
 
-		Project dataManagement = this.projectService.add(Project.builder().project("Data management").manager(karthik)
-				.priority(15).startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(5)).build());
+		ProjectBean dataManagement = this.projectService.add(ProjectBean.builder().project("Data management").manager(karthik)
+				.priority(15).startDate(LocalDate.now().minusDays(10)).endDate(LocalDate.now().plusDays(5)).build());
 
-		Project appManagement = this.projectService.add(Project.builder().project("Application management")
-				.manager(kumar).priority(15).startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(15)).build());
+		ProjectBean appManagement = this.projectService.add(ProjectBean.builder().project("Application management")
+				.manager(kumar).priority(15).startDate(LocalDate.now().minusDays(10)).endDate(LocalDate.now().plusDays(15)).build());
 
-		Task createData = this.taskService.add(Task.builder().project(dataManagement).isParentTask(true).taskName("Create Data").priority(10)
+		TaskBean createData = this.taskService.add(TaskBean.builder().project(dataManagement).isParentTask(true).taskName("Create Data").priority(13)
 				.status("NEW").startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(10)).user(krishna).build());
 		
-		Task updateData = this.taskService.add(Task.builder().project(dataManagement).isParentTask(false).parentTask(createData).taskName("Create Data").priority(10)
-				.status("NEW").startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(10)).user(vel).build());
+		this.taskService.add(TaskBean.builder().project(dataManagement).isParentTask(false).parentTask(createData).taskName("Update Data").priority(30)
+				.status("NEW").startDate(LocalDate.now().minusDays(1)).endDate(LocalDate.now().plusDays(1)).user(vel).build());
 
-		Task createApp = this.taskService.add(Task.builder().project(appManagement).isParentTask(true).taskName("Create App").priority(10)
-				.status("NEW").startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(10)).user(vel).build());
+		TaskBean createApp = this.taskService.add(TaskBean.builder().project(appManagement).isParentTask(true).taskName("Create App").priority(15)
+				.status("NEW").startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(12)).user(vel).build());
 		
-		Task updateApp = this.taskService.add(Task.builder().project(appManagement).isParentTask(false).parentTask(createApp).taskName("Update App").priority(10)
-				.status("NEW").startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(10)).user(krishna).build());
+		this.taskService.add(TaskBean.builder().project(appManagement).isParentTask(false).parentTask(createApp).taskName("Update App").priority(20)
+				.status("NEW").startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(2)).user(krishna).build());
 	}
 
 }
