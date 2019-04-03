@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>UserService.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">projectManagerApi (Apr 2, 2019 8:23:38 PM)</a> &gt; <a href="../../index.html" class="el_group">projectManagerApi</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">com.cts.fse.projectmanager.service</a> &gt; <span class="el_source">UserService.java</span></div><h1>UserService.java</h1><pre class="source lang-java linenums">package com.cts.fse.projectmanager.service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import javax.persistence.EntityNotFoundException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cts.fse.projectmanager.bean.UserBean;
+import com.cts.fse.projectmanager.entity.User;
+import com.cts.fse.projectmanager.repository.UserRepository;
+import com.cts.fse.projectmanager.transformer.UserTransformer;
+
+import lombok.extern.slf4j.Slf4j;
+
+<span class="fc" id="L20">@Slf4j</span>
+@Service
+public class UserService {
+	
+<span class="fc" id="L24">	public UserService() {}</span>
+	
+<span class="fc" id="L26">	public UserService(UserRepository repository) {</span>
+<span class="fc" id="L27">		this.repository = repository;</span>
+<span class="fc" id="L28">	}</span>
+
+	@Autowired
+	private UserRepository repository;
+
+	public List&lt;UserBean&gt; findAll() {
+<span class="fc" id="L34">		Iterable&lt;User&gt; users = repository.findAll();</span>
+<span class="fc" id="L35">		return StreamSupport.stream(users.spliterator(), false).map(UserTransformer::toBean).collect(Collectors.toList());	</span>
+	}
+
+	public UserBean add(UserBean user) {
+<span class="fc" id="L39">		log.info(&quot;Add user &quot; + user);</span>
+<span class="fc" id="L40">		return UserTransformer.toBean(repository.save(UserTransformer.toEntity(user)));</span>
+	}
+
+	public UserBean update(UserBean user) {
+<span class="fc" id="L44">		log.info(&quot;Update user &quot; + user);</span>
+<span class="fc" id="L45">		return UserTransformer.toBean(repository.save(UserTransformer.toEntity(user)));</span>
+	}
+
+	public void delete(Long id) {
+<span class="fc" id="L49">		log.info(&quot;Delete with ID &quot; + id);</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">		if (!repository.existsById(id)) {</span>
+<span class="fc" id="L51">			log.error(&quot;Not Found for Id &quot; + id);</span>
+<span class="fc" id="L52">			throw new EntityNotFoundException(&quot;Not Found for Id &quot; + id);</span>
+		}
+<span class="fc" id="L54">		repository.deleteById(id);</span>
+<span class="fc" id="L55">	}</span>
+
+	public UserBean findById(Long id) {
+<span class="fc" id="L58">		log.info(&quot;find By ID &quot; + id);</span>
+<span class="fc" id="L59">		Optional&lt;User&gt; user = repository.findById(id);</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">		if (!user.isPresent()) {</span>
+<span class="fc" id="L61">			log.error(&quot;User Not Found for Id &quot; + id);</span>
+<span class="fc" id="L62">			throw new EntityNotFoundException(&quot;User Not Found for Id &quot; + id);</span>
+		}
+<span class="fc" id="L64">		return UserTransformer.toBean(user.get());</span>
+	}
+
+	public UserBean findByEmpId(Long empId) {
+<span class="fc" id="L68">		log.info(&quot;find By emp id &quot; + empId);</span>
+<span class="fc" id="L69">		List&lt;User&gt; user = repository.findByEmpId(empId);</span>
+<span class="pc bpc" id="L70" title="1 of 4 branches missed.">		if (user != null &amp;&amp; user.size() &gt; 0) {</span>
+<span class="fc" id="L71">			return UserTransformer.toBean(user.get(0)); </span>
+		}
+<span class="fc" id="L73">		return null;</span>
+	}
+
+	public void deleteAll() {
+<span class="fc" id="L77">		log.info(&quot;Delete All &quot; );</span>
+<span class="fc" id="L78">		this.repository.deleteAll();</span>
+<span class="fc" id="L79">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>projectManagerApi (Apr 2, 2019 8:23:38 PM)</div></body></html>

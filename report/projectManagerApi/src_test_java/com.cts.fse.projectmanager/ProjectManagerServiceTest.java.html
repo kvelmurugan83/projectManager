@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ProjectManagerServiceTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">projectManagerApi (Apr 2, 2019 8:23:38 PM)</a> &gt; <a href="../../index.html" class="el_group">projectManagerApi</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.cts.fse.projectmanager</a> &gt; <span class="el_source">ProjectManagerServiceTest.java</span></div><h1>ProjectManagerServiceTest.java</h1><pre class="source lang-java linenums">package com.cts.fse.projectmanager;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.mock.http.MockHttpOutputMessage;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
+
+import com.cts.fse.projectmanager.bean.ProjectBean;
+import com.cts.fse.projectmanager.bean.TaskBean;
+import com.cts.fse.projectmanager.bean.UserBean;
+import com.cts.fse.projectmanager.service.ProjectService;
+import com.cts.fse.projectmanager.service.TaskService;
+import com.cts.fse.projectmanager.service.UserService;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = ProjectManagerApplication.class)
+@WebAppConfiguration
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+<span class="fc" id="L49">public class ProjectManagerServiceTest {</span>
+
+<span class="fc" id="L51">	private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),</span>
+<span class="fc" id="L52">			MediaType.APPLICATION_JSON.getSubtype(), Charset.forName(&quot;utf8&quot;));</span>
+
+	private MockMvc mockMvc;
+
+	private HttpMessageConverter&lt;Object&gt; mappingJackson2HttpMessageConverter;
+
+	@Autowired
+	private WebApplicationContext webApplicationContext;
+
+	@Autowired
+	private ProjectService projectService;
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private TaskService taskService;
+
+	@SuppressWarnings(&quot;unchecked&quot;)
+	@Autowired
+	void setConverters(HttpMessageConverter&lt;?&gt;[] converters) {
+
+<span class="fc" id="L72">		this.mappingJackson2HttpMessageConverter = (HttpMessageConverter&lt;Object&gt;) Arrays.asList(converters).stream()</span>
+<span class="fc" id="L73">				.filter(hmc -&gt; hmc instanceof MappingJackson2HttpMessageConverter).findAny().orElse(null);</span>
+
+<span class="fc" id="L75">		assertNotNull(&quot;the JSON message converter must not be null&quot;, this.mappingJackson2HttpMessageConverter);</span>
+<span class="fc" id="L76">	}</span>
+
+	@Before
+	public void setup() throws Exception {
+<span class="fc" id="L80">		this.mockMvc = webAppContextSetup(webApplicationContext).build();</span>
+<span class="fc" id="L81">		this.taskService.deleteAll();</span>
+<span class="fc" id="L82">		this.projectService.deleteAll();</span>
+<span class="fc" id="L83">		this.userService.deleteAll();</span>
+<span class="fc" id="L84">		UserBean vel = this.userService</span>
+<span class="fc" id="L85">				.add(UserBean.builder().firstName(&quot;Velmurugan&quot;).lastName(&quot;Kandasamy&quot;).empId(new Long(10001)).build());</span>
+<span class="fc" id="L86">		UserBean kumar = this.userService</span>
+<span class="fc" id="L87">				.add(UserBean.builder().firstName(&quot;Kumar&quot;).lastName(&quot;Moorthy&quot;).empId(new Long(10002)).build());</span>
+<span class="fc" id="L88">		UserBean karthik = this.userService</span>
+<span class="fc" id="L89">				.add(UserBean.builder().firstName(&quot;Karthik&quot;).lastName(&quot;Kannan&quot;).empId(new Long(10003)).build());</span>
+<span class="fc" id="L90">		UserBean krishna = this.userService</span>
+<span class="fc" id="L91">				.add(UserBean.builder().firstName(&quot;Krishnaraj&quot;).lastName(&quot;Jeganathan&quot;).empId(new Long(10004)).build());</span>
+
+<span class="fc" id="L93">		ProjectBean dataManagement = this.projectService.add(ProjectBean.builder().project(&quot;Data management&quot;).manager(karthik)</span>
+<span class="fc" id="L94">				.priority(15).startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(5)).build());</span>
+		
+<span class="fc" id="L96">		dataManagement = this.projectService.update(dataManagement);</span>
+
+<span class="fc" id="L98">		ProjectBean appManagement = this.projectService.add(ProjectBean.builder().project(&quot;Application management&quot;)</span>
+<span class="fc" id="L99">				.manager(kumar).priority(15).startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(15)).build());</span>
+
+<span class="fc" id="L101">		TaskBean createData = this.taskService.add(TaskBean.builder().project(dataManagement).isParentTask(true)</span>
+<span class="fc" id="L102">				.taskName(&quot;Create Data&quot;).priority(10).status(&quot;NEW&quot;).startDate(LocalDate.now())</span>
+<span class="fc" id="L103">				.endDate(LocalDate.now().plusDays(10)).user(krishna).build());</span>
+
+<span class="fc" id="L105">		this.taskService.add(TaskBean.builder().project(dataManagement).isParentTask(false)</span>
+<span class="fc" id="L106">				.parentTask(createData).taskName(&quot;Create Data&quot;).priority(10).status(&quot;NEW&quot;).startDate(LocalDate.now())</span>
+<span class="fc" id="L107">				.endDate(LocalDate.now().plusDays(10)).user(vel).build());</span>
+
+<span class="fc" id="L109">		TaskBean createApp = this.taskService.add(TaskBean.builder().project(appManagement).isParentTask(true)</span>
+<span class="fc" id="L110">				.taskName(&quot;Create App&quot;).priority(10).status(&quot;NEW&quot;).startDate(LocalDate.now())</span>
+<span class="fc" id="L111">				.endDate(LocalDate.now().plusDays(10)).user(vel).build());</span>
+		
+<span class="fc" id="L113">		createApp = this.taskService.update(createApp);</span>
+
+<span class="fc" id="L115">		this.taskService.add(TaskBean.builder().project(appManagement).isParentTask(false)</span>
+<span class="fc" id="L116">				.parentTask(createApp).taskName(&quot;Update App&quot;).priority(10).status(&quot;NEW&quot;).startDate(LocalDate.now())</span>
+<span class="fc" id="L117">				.endDate(LocalDate.now().plusDays(10)).user(krishna).build());</span>
+<span class="fc" id="L118">	}</span>
+
+	@Test
+	public void testRetriveAllUser() throws Exception {
+<span class="fc" id="L122">		mockMvc.perform(get(&quot;/projectmanager/api/user&quot;)).andDo(print()).andExpect(status().isOk())</span>
+<span class="fc" id="L123">				.andExpect(content().contentType(contentType)).andExpect(jsonPath(&quot;$&quot;, hasSize(4)));</span>
+<span class="fc" id="L124">	}</span>
+
+	@Test
+	public void testCreateUser() throws Exception {
+<span class="fc" id="L128">		String jsonUser = json(</span>
+<span class="fc" id="L129">				UserBean.builder().firstName(&quot;SivaKumar&quot;).lastName(&quot;Raju&quot;).empId(Long.valueOf(10005)).build());</span>
+<span class="fc" id="L130">		this.mockMvc.perform(post(&quot;/projectmanager/api/user&quot;).contentType(contentType).content(jsonUser))</span>
+<span class="fc" id="L131">				.andExpect(status().isOk()).andExpect(content().contentType(contentType))</span>
+<span class="fc" id="L132">				.andExpect(jsonPath(&quot;$.firstName&quot;, is(&quot;SivaKumar&quot;))).andExpect(jsonPath(&quot;$.lastName&quot;, is(&quot;Raju&quot;)))</span>
+<span class="fc" id="L133">				.andExpect(jsonPath(&quot;$.empId&quot;, is(10005)));</span>
+<span class="fc" id="L134">	}</span>
+	
+	@Test
+	public void testUpdateUser() throws Exception {
+<span class="fc" id="L138">		UserBean user = this.userService</span>
+<span class="fc" id="L139">				.add(UserBean.builder().firstName(&quot;Venkat&quot;).lastName(&quot;Ramamoorthy&quot;).empId(Long.valueOf(10006)).build());</span>
+<span class="fc" id="L140">		user.setFirstName(&quot;Venkateswaran&quot;);</span>
+<span class="fc" id="L141">		this.mockMvc.perform(put(&quot;/projectmanager/api/user&quot;).contentType(contentType).content(json(user)))</span>
+<span class="fc" id="L142">				.andExpect(status().isOk()).andExpect(content().contentType(contentType))</span>
+<span class="fc" id="L143">				.andExpect(jsonPath(&quot;$.firstName&quot;, is(&quot;Venkateswaran&quot;)))</span>
+<span class="fc" id="L144">				.andExpect(jsonPath(&quot;$.lastName&quot;, is(&quot;Ramamoorthy&quot;))).andExpect(jsonPath(&quot;$.empId&quot;, is(10006)));</span>
+<span class="fc" id="L145">	}</span>
+	
+	@Test
+	public void testDeleteUser() throws Exception {
+<span class="fc" id="L149">		UserBean user = this.userService</span>
+<span class="fc" id="L150">				.add(UserBean.builder().firstName(&quot;Senthil&quot;).lastName(&quot;Senthil&quot;).empId(Long.valueOf(10008)).build());</span>
+		
+<span class="fc" id="L152">		this.mockMvc.perform(delete(&quot;/projectmanager/api/user/&quot; + user.getId()))</span>
+<span class="fc" id="L153">				.andExpect(status().isOk());</span>
+		
+<span class="fc" id="L155">		this.mockMvc.perform(get(&quot;/projectmanager/api/user/&quot; + user.getId()))</span>
+<span class="fc" id="L156">		.andExpect(status().isNotFound());</span>
+<span class="fc" id="L157">	}</span>
+
+	@Test
+	public void testCreateProject() throws Exception {
+<span class="fc" id="L161">		String jsonProject = json(ProjectBean.builder().id(Long.valueOf(100)).project(&quot;User management&quot;).priority(15).startDate(LocalDate.now())</span>
+<span class="fc" id="L162">				.endDate(LocalDate.now().plusDays(15)).build());</span>
+		
+<span class="fc" id="L164">		this.mockMvc.perform(post(&quot;/projectmanager/api/project&quot;).contentType(contentType).content(jsonProject))</span>
+<span class="fc" id="L165">				.andExpect(status().isOk()).andExpect(content().contentType(contentType))</span>
+<span class="fc" id="L166">				.andExpect(jsonPath(&quot;$.project&quot;, is(&quot;User management&quot;))).andExpect(jsonPath(&quot;$.priority&quot;, is(15)))</span>
+<span class="fc" id="L167">				.andExpect(</span>
+<span class="fc" id="L168">						jsonPath(&quot;$.startDate&quot;, is(DateTimeFormatter.ofPattern(&quot;YYYY-MM-dd&quot;).format(LocalDate.now()))))</span>
+<span class="fc" id="L169">				.andExpect(jsonPath(&quot;$.endDate&quot;,</span>
+<span class="fc" id="L170">						is(DateTimeFormatter.ofPattern(&quot;YYYY-MM-dd&quot;).format(LocalDate.now().plusDays(15)))));</span>
+<span class="fc" id="L171">	}</span>
+
+	@Test
+	public void testUpdateProject() throws Exception {
+<span class="fc" id="L175">		ProjectBean project = this.projectService.add(ProjectBean.builder().project(&quot;Infra Management&quot;).priority(15)</span>
+<span class="fc" id="L176">				.startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(15)).build());</span>
+<span class="fc" id="L177">		project.setProject(&quot;Infrastructure Management&quot;);</span>
+<span class="fc" id="L178">		project.setPriority(30);</span>
+<span class="fc" id="L179">		project.setStartDate(LocalDate.now().plusDays(5));</span>
+<span class="fc" id="L180">		project.setEndDate(LocalDate.now().plusDays(30));</span>
+<span class="fc" id="L181">		this.mockMvc.perform(put(&quot;/projectmanager/api/project&quot;).contentType(contentType).content(json(project)))</span>
+<span class="fc" id="L182">				.andExpect(status().isOk()).andExpect(content().contentType(contentType))</span>
+<span class="fc" id="L183">				.andExpect(jsonPath(&quot;$.project&quot;, is(&quot;Infrastructure Management&quot;)))</span>
+<span class="fc" id="L184">				.andExpect(jsonPath(&quot;$.priority&quot;, is(30)))</span>
+<span class="fc" id="L185">				.andExpect(jsonPath(&quot;$.startDate&quot;,</span>
+<span class="fc" id="L186">						is(DateTimeFormatter.ofPattern(&quot;YYYY-MM-dd&quot;).format(LocalDate.now().plusDays(5)))))</span>
+<span class="fc" id="L187">				.andExpect(jsonPath(&quot;$.endDate&quot;,</span>
+<span class="fc" id="L188">						is(DateTimeFormatter.ofPattern(&quot;YYYY-MM-dd&quot;).format(LocalDate.now().plusDays(30)))));</span>
+<span class="fc" id="L189">	}</span>
+	
+	@Test
+	public void testDeleteProject() throws Exception {
+<span class="fc" id="L193">		ProjectBean project = this.projectService.add(ProjectBean.builder().project(&quot;Network Management&quot;).priority(15)</span>
+<span class="fc" id="L194">				.startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(15)).build());</span>
+		
+<span class="fc" id="L196">		this.mockMvc.perform(delete(&quot;/projectmanager/api/project/&quot; + project.getId()))</span>
+<span class="fc" id="L197">				.andExpect(status().isOk());</span>
+		
+<span class="fc" id="L199">		this.mockMvc.perform(get(&quot;/projectmanager/api/project/&quot; + project.getId()))</span>
+<span class="fc" id="L200">		.andExpect(status().isNotFound());</span>
+<span class="fc" id="L201">	}</span>
+
+	@Test
+	public void testCreateTask() throws Exception {
+<span class="fc" id="L205">		String jsonTask = json(TaskBean.builder().id(Long.valueOf(100)).isParentTask(false).taskName(&quot;Create Data&quot;).priority(10).status(&quot;NEW&quot;)</span>
+<span class="fc" id="L206">				.startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(10)).build());</span>
+<span class="fc" id="L207">		this.mockMvc.perform(post(&quot;/projectmanager/api/task&quot;).contentType(contentType).content(jsonTask))</span>
+<span class="fc" id="L208">				.andExpect(status().isOk()).andExpect(content().contentType(contentType))</span>
+<span class="fc" id="L209">				.andExpect(jsonPath(&quot;$.taskName&quot;, is(&quot;Create Data&quot;))).andExpect(jsonPath(&quot;$.status&quot;, is(&quot;NEW&quot;)))</span>
+<span class="fc" id="L210">				.andExpect(jsonPath(&quot;$.priority&quot;, is(10)))</span>
+<span class="fc" id="L211">				.andExpect(</span>
+<span class="fc" id="L212">						jsonPath(&quot;$.startDate&quot;, is(DateTimeFormatter.ofPattern(&quot;YYYY-MM-dd&quot;).format(LocalDate.now()))))</span>
+<span class="fc" id="L213">				.andExpect(jsonPath(&quot;$.endDate&quot;,</span>
+<span class="fc" id="L214">						is(DateTimeFormatter.ofPattern(&quot;YYYY-MM-dd&quot;).format(LocalDate.now().plusDays(10)))));</span>
+<span class="fc" id="L215">	}</span>
+	
+	@Test
+	public void testUpdateTask() throws Exception {
+<span class="fc" id="L219">		TaskBean task = this.taskService.add(TaskBean.builder().isParentTask(false).taskName(&quot;Create Data&quot;).priority(10).status(&quot;NEW&quot;)</span>
+<span class="fc" id="L220">				.startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(10)).build());</span>
+<span class="fc" id="L221">		task.setTaskName(&quot;Modify Data&quot;);</span>
+<span class="fc" id="L222">		task.setStatus(&quot;Completed&quot;);</span>
+<span class="fc" id="L223">		this.mockMvc.perform(put(&quot;/projectmanager/api/task&quot;).contentType(contentType).content(json(task)))</span>
+<span class="fc" id="L224">				.andExpect(status().isOk()).andExpect(content().contentType(contentType))</span>
+<span class="fc" id="L225">				.andExpect(jsonPath(&quot;$.taskName&quot;, is(&quot;Modify Data&quot;))).andExpect(jsonPath(&quot;$.status&quot;, is(&quot;Completed&quot;)))</span>
+<span class="fc" id="L226">				.andExpect(jsonPath(&quot;$.priority&quot;, is(10)))</span>
+<span class="fc" id="L227">				.andExpect(</span>
+<span class="fc" id="L228">						jsonPath(&quot;$.startDate&quot;, is(DateTimeFormatter.ofPattern(&quot;YYYY-MM-dd&quot;).format(LocalDate.now()))))</span>
+<span class="fc" id="L229">				.andExpect(jsonPath(&quot;$.endDate&quot;,</span>
+<span class="fc" id="L230">						is(DateTimeFormatter.ofPattern(&quot;YYYY-MM-dd&quot;).format(LocalDate.now().plusDays(10)))));</span>
+<span class="fc" id="L231">	}</span>
+	
+	@Test
+	public void testDeleteTask() throws Exception {
+<span class="fc" id="L235">		TaskBean task = this.taskService.add(TaskBean.builder().isParentTask(false).taskName(&quot;Create Data&quot;).priority(10).status(&quot;NEW&quot;)</span>
+<span class="fc" id="L236">				.startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(10)).build());</span>
+		
+<span class="fc" id="L238">		this.mockMvc.perform(delete(&quot;/projectmanager/api/task/&quot; + task.getId()))</span>
+<span class="fc" id="L239">				.andExpect(status().isOk());</span>
+		
+<span class="fc" id="L241">		this.mockMvc.perform(get(&quot;/projectmanager/api/task/&quot; + task.getId()))</span>
+<span class="fc" id="L242">		.andExpect(status().isNotFound());</span>
+<span class="fc" id="L243">	}</span>
+
+	@Test
+	public void testRetriveAllProject() throws Exception {
+<span class="fc" id="L247">		mockMvc.perform(get(&quot;/projectmanager/api/project&quot;)).andDo(print()).andExpect(status().isOk())</span>
+<span class="fc" id="L248">				.andExpect(content().contentType(contentType)).andExpect(jsonPath(&quot;$&quot;, hasSize(2)));</span>
+<span class="fc" id="L249">	}</span>
+
+	@Test
+	public void testRetriveAllTask() throws Exception {
+<span class="fc" id="L253">		mockMvc.perform(get(&quot;/projectmanager/api/task&quot;)).andDo(print()).andExpect(status().isOk())</span>
+<span class="fc" id="L254">				.andExpect(content().contentType(contentType)).andExpect(jsonPath(&quot;$&quot;, hasSize(4)));</span>
+<span class="fc" id="L255">	}</span>
+
+	protected String json(Object o) throws IOException {
+<span class="fc" id="L258">		MockHttpOutputMessage mockHttpOutputMessage = new MockHttpOutputMessage();</span>
+<span class="fc" id="L259">		this.mappingJackson2HttpMessageConverter.write(o, MediaType.APPLICATION_JSON, mockHttpOutputMessage);</span>
+<span class="fc" id="L260">		return mockHttpOutputMessage.getBodyAsString();</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>projectManagerApi (Apr 2, 2019 8:23:38 PM)</div></body></html>

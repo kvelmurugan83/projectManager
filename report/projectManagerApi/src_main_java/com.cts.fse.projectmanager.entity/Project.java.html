@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>Project.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">projectManagerApi (Apr 2, 2019 8:23:38 PM)</a> &gt; <a href="../../index.html" class="el_group">projectManagerApi</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">com.cts.fse.projectmanager.entity</a> &gt; <span class="el_source">Project.java</span></div><h1>Project.java</h1><pre class="source lang-java linenums">package com.cts.fse.projectmanager.entity;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+<span class="pc" id="L26">@Builder</span>
+<span class="pc bpc" id="L27" title="46 of 64 branches missed.">@Data</span>
+@Entity
+<span class="fc" id="L29">@AllArgsConstructor</span>
+<span class="fc" id="L30">@NoArgsConstructor</span>
+<span class="fc" id="L31">@ToString</span>
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = &quot;id&quot;)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Project implements Serializable {
+
+	private static final long serialVersionUID = 20190121;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = &quot;PROJECT_ID&quot;)
+	private Long id;
+
+	@Column(name = &quot;PROJECT&quot;)
+	private String project;
+
+	@Column(name = &quot;START_DATE&quot;, nullable = true)
+	private LocalDate startDate;
+
+	@Column(name = &quot;END_DATE&quot;, nullable = true)
+	private LocalDate endDate;
+
+	@Column(name = &quot;PRIORITY&quot;)
+	private Integer priority;
+	
+	@Column(name = &quot;SUSPEND&quot;, nullable = true)
+	private Boolean suspend;
+
+	@OneToOne(fetch = FetchType.EAGER, optional = true)
+	@JoinColumn(name = &quot;MANAGER_ID&quot;)
+	private User manager;
+	
+	@Transient
+	private int noOfTasks;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>projectManagerApi (Apr 2, 2019 8:23:38 PM)</div></body></html>

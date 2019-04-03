@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>TaskServiceTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">projectManagerApi (Apr 2, 2019 8:23:38 PM)</a> &gt; <a href="../../index.html" class="el_group">projectManagerApi</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.cts.fse.projectmanager.service</a> &gt; <span class="el_source">TaskServiceTest.java</span></div><h1>TaskServiceTest.java</h1><pre class="source lang-java linenums">package com.cts.fse.projectmanager.service;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import javax.persistence.EntityNotFoundException;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.cts.fse.projectmanager.bean.TaskBean;
+import com.cts.fse.projectmanager.entity.Task;
+import com.cts.fse.projectmanager.repository.TaskRepository;
+import com.cts.fse.projectmanager.transformer.TaskTransformer;
+
+<span class="fc" id="L22">public class TaskServiceTest {</span>
+
+<span class="fc" id="L24">	TaskRepository repository = mock(TaskRepository.class);</span>
+	TaskService service;
+<span class="fc" id="L26">	private UserService userService = mock(UserService.class);</span>
+<span class="fc" id="L27">	private ProjectService projectService = mock(ProjectService.class);</span>
+
+	@Before
+	public void setup() {
+<span class="fc" id="L31">		service = new TaskService(repository, userService, projectService);</span>
+<span class="fc" id="L32">	}</span>
+
+	@Test
+	public void testRetrieveAll() {
+<span class="fc" id="L36">		Task expected = Task.builder().taskName(&quot;Name&quot;).build();</span>
+<span class="fc" id="L37">		when(repository.findAll()).thenReturn(Collections.singletonList(expected));</span>
+<span class="fc" id="L38">		List&lt;TaskBean&gt; actual = service.findAll();</span>
+<span class="fc" id="L39">		verify(repository).findAll();</span>
+<span class="fc" id="L40">		actual.forEach(t -&gt; {</span>
+<span class="fc" id="L41">			assertEquals(t.getTaskName(), &quot;Name&quot;);</span>
+<span class="fc" id="L42">		});</span>
+<span class="fc" id="L43">	}</span>
+
+	@Test
+	public void testAdd() {
+<span class="fc" id="L47">		TaskBean expected = TaskBean.builder().build();</span>
+<span class="fc" id="L48">		when(repository.save(TaskTransformer.toEntity(expected))).thenReturn(TaskTransformer.toEntity(expected));</span>
+
+<span class="fc" id="L50">		TaskBean actual = service.add(expected);</span>
+
+<span class="fc" id="L52">		verify(repository).save(TaskTransformer.toEntity(expected));</span>
+<span class="fc" id="L53">		assertEquals(actual, expected);</span>
+<span class="fc" id="L54">	}</span>
+
+	@Test
+	public void testUpdate() {
+<span class="fc" id="L58">		TaskBean expected = TaskBean.builder().build();</span>
+<span class="fc" id="L59">		when(repository.save(TaskTransformer.toEntity(expected))).thenReturn(TaskTransformer.toEntity(expected));</span>
+
+<span class="fc" id="L61">		TaskBean actual = service.update(expected);</span>
+
+<span class="fc" id="L63">		verify(repository).save(TaskTransformer.toEntity(expected));</span>
+<span class="fc" id="L64">		assertEquals(actual, expected);</span>
+<span class="fc" id="L65">	}</span>
+
+	@Test
+	public void testDelete() {
+<span class="fc" id="L69">		when(repository.existsById(Long.valueOf(1000))).thenReturn(true);</span>
+
+<span class="fc" id="L71">		service.delete(Long.valueOf(1000));</span>
+
+<span class="fc" id="L73">		verify(repository).existsById(Long.valueOf(1000));</span>
+<span class="fc" id="L74">		verify(repository).deleteById(Long.valueOf(1000));</span>
+<span class="fc" id="L75">	}</span>
+
+	@Test(expected = EntityNotFoundException.class)
+	public void testDeleteFail() {
+<span class="fc" id="L79">		Long id = new Long(1);</span>
+<span class="fc" id="L80">		when(repository.existsById(id)).thenReturn(false);</span>
+
+<span class="nc" id="L82">		service.delete(id);</span>
+<span class="nc" id="L83">	}</span>
+
+	@Test(expected = EntityNotFoundException.class)
+	public void testFindByIdFail() {
+<span class="fc" id="L87">		Long id = new Long(1);</span>
+<span class="fc" id="L88">		when(repository.findById(id)).thenReturn(Optional.empty());</span>
+
+<span class="nc" id="L90">		service.findById(id);</span>
+<span class="nc" id="L91">	}</span>
+
+	@Test
+	public void testDeleteAll() {
+<span class="fc" id="L95">		service.deleteAll();</span>
+
+<span class="fc" id="L97">		verify(repository).deleteAll();</span>
+<span class="fc" id="L98">	}</span>
+
+	@Test
+	public void testFindById() {
+<span class="fc" id="L102">		Optional&lt;Task&gt; expected = Optional.of(Task.builder().id(Long.valueOf(1000)).build());</span>
+<span class="fc" id="L103">		when(repository.findById(Long.valueOf(1000))).thenReturn(expected);</span>
+
+<span class="fc" id="L105">		service.findById(Long.valueOf(1000));</span>
+
+<span class="fc" id="L107">		verify(repository).findById(Long.valueOf(1000));</span>
+<span class="fc" id="L108">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>projectManagerApi (Apr 2, 2019 8:23:38 PM)</div></body></html>

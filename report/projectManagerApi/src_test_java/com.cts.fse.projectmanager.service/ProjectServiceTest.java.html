@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ProjectServiceTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">projectManagerApi (Apr 2, 2019 8:23:38 PM)</a> &gt; <a href="../../index.html" class="el_group">projectManagerApi</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.cts.fse.projectmanager.service</a> &gt; <span class="el_source">ProjectServiceTest.java</span></div><h1>ProjectServiceTest.java</h1><pre class="source lang-java linenums">package com.cts.fse.projectmanager.service;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import javax.persistence.EntityNotFoundException;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.cts.fse.projectmanager.bean.ProjectBean;
+import com.cts.fse.projectmanager.entity.Project;
+import com.cts.fse.projectmanager.repository.ProjectRepository;
+import com.cts.fse.projectmanager.transformer.ProjectTransformer;
+
+<span class="fc" id="L23">public class ProjectServiceTest {</span>
+<span class="fc" id="L24">	ProjectRepository repository = mock(ProjectRepository.class);</span>
+	ProjectService service;
+<span class="fc" id="L26">	private UserService userService = mock(UserService.class);;</span>
+
+<span class="fc" id="L28">	private TaskService taskService = mock(TaskService.class);;</span>
+
+	@Before
+	public void setup() {
+<span class="fc" id="L32">		service = new ProjectService(repository, userService, taskService);</span>
+<span class="fc" id="L33">	}</span>
+
+	@Test
+	public void testRetrieveAll() {
+<span class="fc" id="L37">		ProjectBean project = ProjectBean.builder().project(&quot;Project&quot;).build();</span>
+<span class="fc" id="L38">		when(repository.findAll()).thenReturn(Collections.singletonList(ProjectTransformer.toEntity(project)));</span>
+<span class="fc" id="L39">		List&lt;ProjectBean&gt; actual = service.findAll();</span>
+<span class="fc" id="L40">		verify(repository).findAll();</span>
+<span class="fc" id="L41">		actual.forEach(p -&gt; {</span>
+<span class="fc" id="L42">			assertEquals(p.getProject(), &quot;Project&quot;);</span>
+<span class="fc" id="L43">		});</span>
+<span class="fc" id="L44">	}</span>
+
+	@Test
+	public void testAdd() {
+<span class="fc" id="L48">		ProjectBean expected = ProjectBean.builder().build();</span>
+<span class="fc" id="L49">		when(repository.save(ProjectTransformer.toEntity(expected))).thenReturn(ProjectTransformer.toEntity(expected));</span>
+
+<span class="fc" id="L51">		ProjectBean actual = service.add(expected);</span>
+
+<span class="fc" id="L53">		verify(repository).save(ProjectTransformer.toEntity(expected));</span>
+<span class="fc" id="L54">		assertEquals(actual, expected);</span>
+<span class="fc" id="L55">	}</span>
+
+	@Test
+	public void testUpdate() {
+<span class="fc" id="L59">		ProjectBean expected = ProjectBean.builder().build();</span>
+<span class="fc" id="L60">		when(repository.save(ProjectTransformer.toEntity(expected))).thenReturn(ProjectTransformer.toEntity(expected));</span>
+		
+<span class="fc" id="L62">		ProjectBean actual = service.update(expected);</span>
+
+<span class="fc" id="L64">		verify(repository).save(ProjectTransformer.toEntity(expected));</span>
+<span class="fc" id="L65">		assertEquals(actual, expected);</span>
+<span class="fc" id="L66">	}</span>
+
+	@Test
+	public void testDelete() {
+<span class="fc" id="L70">		when(repository.existsById(Long.valueOf(1000))).thenReturn(true);</span>
+
+<span class="fc" id="L72">		service.delete(Long.valueOf(1000));</span>
+
+<span class="fc" id="L74">		verify(repository).existsById(Long.valueOf(1000));</span>
+<span class="fc" id="L75">		verify(repository).deleteById(Long.valueOf(1000));</span>
+<span class="fc" id="L76">	}</span>
+
+	@Test
+	public void testDeleteAll() {
+<span class="fc" id="L80">		service.deleteAll();</span>
+
+<span class="fc" id="L82">		verify(repository).deleteAll();</span>
+<span class="fc" id="L83">	}</span>
+
+	@Test
+	public void testFindById() {
+<span class="fc" id="L87">		Optional&lt;Project&gt; expected = Optional.of(Project.builder().id(Long.valueOf(1000)).build());</span>
+<span class="fc" id="L88">		when(repository.findById(Long.valueOf(1000))).thenReturn(expected);</span>
+
+<span class="fc" id="L90">		service.findById(Long.valueOf(1000));</span>
+
+<span class="fc" id="L92">		verify(repository).findById(Long.valueOf(1000));</span>
+<span class="fc" id="L93">	}</span>
+
+	@Test
+	public void testfindByProjectName() {
+<span class="fc" id="L97">		Project expected = Project.builder().project(&quot;T&quot;).build();</span>
+<span class="fc" id="L98">		when(repository.findByProject(&quot;TEST&quot;)).thenReturn(Collections.singletonList(expected));</span>
+
+<span class="fc" id="L100">		ProjectBean actual = service.findByProjectName(&quot;TEST&quot;);</span>
+
+<span class="fc" id="L102">		verify(repository).findByProject(&quot;TEST&quot;);</span>
+<span class="fc" id="L103">		assertEquals(actual.getProject(), &quot;T&quot;);</span>
+<span class="fc" id="L104">	}</span>
+	
+	@Test
+	public void testfindByProjectNameReturnsNullWhenNotFound() {
+<span class="fc" id="L108">		when(repository.findByProject(&quot;TEST&quot;)).thenReturn(null);</span>
+
+<span class="fc" id="L110">		ProjectBean actual = service.findByProjectName(&quot;TEST&quot;);</span>
+
+<span class="fc" id="L112">		verify(repository).findByProject(&quot;TEST&quot;);</span>
+<span class="fc" id="L113">		assertNull(actual);</span>
+<span class="fc" id="L114">	}</span>
+
+	@Test(expected = EntityNotFoundException.class)
+	public void testDeleteFail() {
+<span class="fc" id="L118">		Long id = new Long(1);</span>
+<span class="fc" id="L119">		when(repository.existsById(id)).thenReturn(false);</span>
+
+<span class="nc" id="L121">		service.delete(id);</span>
+<span class="nc" id="L122">	}</span>
+
+	@Test(expected = EntityNotFoundException.class)
+	public void testFindByIdFail() {
+<span class="fc" id="L126">		Long id = new Long(1);</span>
+<span class="fc" id="L127">		when(repository.findById(id)).thenReturn(Optional.empty());</span>
+
+<span class="nc" id="L129">		service.findById(id);</span>
+<span class="nc" id="L130">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>projectManagerApi (Apr 2, 2019 8:23:38 PM)</div></body></html>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ProjectService.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">projectManagerApi (Apr 2, 2019 8:23:38 PM)</a> &gt; <a href="../../index.html" class="el_group">projectManagerApi</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">com.cts.fse.projectmanager.service</a> &gt; <span class="el_source">ProjectService.java</span></div><h1>ProjectService.java</h1><pre class="source lang-java linenums">package com.cts.fse.projectmanager.service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import javax.persistence.EntityNotFoundException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cts.fse.projectmanager.bean.ProjectBean;
+import com.cts.fse.projectmanager.bean.TaskBean;
+import com.cts.fse.projectmanager.entity.Project;
+import com.cts.fse.projectmanager.repository.ProjectRepository;
+import com.cts.fse.projectmanager.transformer.ProjectTransformer;
+import com.cts.fse.projectmanager.transformer.UserTransformer;
+
+import lombok.extern.slf4j.Slf4j;
+
+<span class="fc" id="L22">@Slf4j</span>
+@Service
+public class ProjectService {
+
+<span class="fc" id="L26">	public ProjectService() {</span>
+<span class="fc" id="L27">	}</span>
+
+<span class="fc" id="L29">	public ProjectService(ProjectRepository repository, UserService userService, TaskService taskService) {</span>
+<span class="fc" id="L30">		this.repository = repository;</span>
+<span class="fc" id="L31">		this.userService = userService;</span>
+<span class="fc" id="L32">		this.taskService = taskService;</span>
+<span class="fc" id="L33">	}</span>
+
+	@Autowired
+	private ProjectRepository repository;
+
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private TaskService taskService;
+
+	public List&lt;ProjectBean&gt; findAll() {
+<span class="fc" id="L45">		log.info(&quot;Find All Project&quot;);</span>
+<span class="fc" id="L46">		Iterable&lt;Project&gt; result = repository.findAll();</span>
+<span class="fc" id="L47">		result.forEach(p -&gt; {</span>
+<span class="fc" id="L48">			List&lt;TaskBean&gt; tasks = taskService.findByProjectId(p.getId());</span>
+<span class="fc" id="L49">			int totalTasks = 0;</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">			if (tasks != null) {</span>
+<span class="fc" id="L51">				totalTasks = tasks.size();</span>
+			}
+<span class="fc" id="L53">			p.setNoOfTasks(totalTasks);</span>
+<span class="fc" id="L54">		});</span>
+<span class="fc" id="L55">		return StreamSupport.stream(result.spliterator(), false).map(ProjectTransformer::toBean)</span>
+<span class="fc" id="L56">				.collect(Collectors.toList());</span>
+	}
+
+	public ProjectBean add(ProjectBean p) {
+<span class="fc" id="L60">		log.info(&quot;Add Project  &quot; + p);</span>
+<span class="fc" id="L61">		Project project = ProjectTransformer.toEntity(p);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">		if (project.getManager() != null)</span>
+<span class="fc" id="L63">			project.setManager(UserTransformer.toEntity(this.userService.findById(project.getManager().getId())));</span>
+<span class="fc" id="L64">		return ProjectTransformer.toBean(repository.save(project));</span>
+	}
+
+	public ProjectBean update(ProjectBean p) {
+<span class="fc" id="L68">		log.info(&quot;Update Project &quot; + p);</span>
+<span class="fc" id="L69">		Project project = ProjectTransformer.toEntity(p);</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">		if (project.getManager() != null)</span>
+<span class="fc" id="L71">			project.setManager(UserTransformer.toEntity(this.userService.findById(project.getManager().getId())));</span>
+<span class="fc" id="L72">		return ProjectTransformer.toBean(repository.save(project));</span>
+	}
+
+	public void delete(Long id) {
+<span class="fc" id="L76">		log.info(&quot;Delete with ID &quot; + id);</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">		if (!repository.existsById(id)) {</span>
+<span class="fc" id="L78">			log.error(&quot;Not Found for Id &quot; + id);</span>
+<span class="fc" id="L79">			throw new EntityNotFoundException(&quot;Not Found for Id &quot; + id);</span>
+		}
+<span class="fc" id="L81">		repository.deleteById(id);</span>
+<span class="fc" id="L82">	}</span>
+
+	public ProjectBean findById(Long projectId) {
+<span class="fc" id="L85">		log.info(&quot;Find By Project Id&quot; + projectId);</span>
+<span class="fc" id="L86">		Optional&lt;Project&gt; project = repository.findById(projectId);</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">		if (!project.isPresent()) {</span>
+<span class="fc" id="L88">			log.error(&quot;Project Not Found for Id &quot; + projectId);</span>
+<span class="fc" id="L89">			throw new EntityNotFoundException(&quot;Project Not Found for Id &quot; + projectId);</span>
+		}
+<span class="fc" id="L91">		return ProjectTransformer.toBean(project.get());</span>
+	}
+
+	public void deleteAll() {
+<span class="fc" id="L95">		log.info(&quot;Delete All Projects  &quot;);</span>
+<span class="fc" id="L96">		this.repository.deleteAll();</span>
+<span class="fc" id="L97">	}</span>
+
+	public ProjectBean findByProjectName(String projectName) {
+<span class="fc" id="L100">		log.info(&quot;find By Prjoect Name &quot; + projectName);</span>
+<span class="fc" id="L101">		List&lt;Project&gt; project = repository.findByProject(projectName);</span>
+<span class="pc bpc" id="L102" title="1 of 4 branches missed.">		if (project != null &amp;&amp; project.size() &gt; 0) {</span>
+<span class="fc" id="L103">			return ProjectTransformer.toBean(project.get(0));</span>
+		}
+<span class="fc" id="L105">		return null;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>projectManagerApi (Apr 2, 2019 8:23:38 PM)</div></body></html>
